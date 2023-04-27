@@ -16,6 +16,14 @@ router.get("/", async (res, req, next) => {
 
 /** GET /:username - get detail of users.
  * => {user: {username, first_name, last_name, phone, join_at, last_login_at}} */
+router.get("/:username", async (res, req, next) => {
+  try {
+    const user = await User.get(req.params.username);
+    res.json({ user });
+  } catch (e) {
+    return next(e);
+  }
+});
 
 /** GET /:username/to - get messages to user
  * => {messages: [{id, body, sent_at, read_at, from_user: {username, first_name, last_name, phone}}, ...]} */
