@@ -27,6 +27,22 @@ router.get("/:username", async (res, req, next) => {
 
 /** GET /:username/to - get messages to user
  * => {messages: [{id, body, sent_at, read_at, from_user: {username, first_name, last_name, phone}}, ...]} */
+router.get("/:username/to", async (res, req, next) => {
+  try {
+    const messagesTo = await User.messagesTo(req.params.username);
+    res.json({ messagesTo });
+  } catch (e) {
+    return next(e);
+  }
+});
 
 /** GET /:username/from - get messages from user
  * => {messages: [{id, body, sent_at,  read_at, to_user: {username, first_name, last_name, phone}}, ...]} */
+router.get("/:username/from", async (res, req, next) => {
+  try {
+    const messagesFrom = await User.messagesFrom(req.params.username);
+    res.json({ messagesFrom });
+  } catch (e) {
+    return next(e);
+  }
+});
