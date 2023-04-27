@@ -17,14 +17,25 @@ class User {
         phone,
         joine_at,
         last_login_at) 
-      VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp) RETURNING username`,
+      VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp) RETURNING username, password, first_name, last_name, phone`,
       [username, hashPassword, first_name, last_name, phone]
     );
     return newUser.rows[0];
   }
 
   /** Authenticate: is this username/password valid? Returns boolean. */
-  static async authenticate(username, password) {}
+  static async authenticate(username, password) {
+    const results = await db.query(
+      `SELECT password FROM users WHERE username=$1`,
+      [username]
+    );
+    const user = results.rows[0];
+    if (await bcrypt.compare(password, user.password)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /** Update last_login_at for user */
   static async updateLoginTimestamp(username) {}
