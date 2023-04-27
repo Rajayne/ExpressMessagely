@@ -9,7 +9,7 @@ const router = new express.Router();
  * from_user: {username, first_name, last_name, phone},
  * to_user: {username, first_name, last_name, phone}}
  * Make sure that the currently-logged-in users is either the to or from user. */
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", ensureCorrectUser, async (req, res, next) => {
   try {
     const message = Message.get(req.params.id);
     res.json({ message });
@@ -21,7 +21,7 @@ router.get("/:id", async (req, res, next) => {
 /** POST / - post message.
  * {to_username, body} =>
  *   {message: {id, from_username, to_username, body, sent_at}} */
-router.post("/", async (req, res, next) => {
+router.post("/", ensureLoggedIn, async (req, res, next) => {
   try {
     const { to_username, body } = req.body;
     const message = Message.create(to_username, body);
@@ -34,7 +34,7 @@ router.post("/", async (req, res, next) => {
 /** POST/:id/read - mark message as read:
  *  => {message: {id, read_at}}
  * Make sure that the only the intended recipient can mark as read. */
-router.post("/:id/read", async (req, res, next) => {
+router.post("/:id/read", ensureCorrectUser, async (req, res, next) => {
   try {
     const message = Message.markRead(req.params.id);
     res.json({ message });
