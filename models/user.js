@@ -70,12 +70,60 @@ class User {
   /** Return messages from this user.
    * [{id, to_user, body, sent_at, read_at}]
    * where to_user is {username, first_name, last_name, phone} */
-  static async messagesFrom(username) {}
+  static async messagesFrom(username) {
+    const messages = await db.query(
+      `SELECT m.id, m.to_username, u.first_name, u.last_name, u.phone, body, sent_at, read_at 
+      FROM messages m
+      JOIN users u
+      ON u.username = m.to_username
+      WHERE from_username=$1`,
+      [username]
+    );
+    return (
+      messages.rows,
+      map((m) => ({
+        id: m.id,
+        to_user: {
+          username: m.to_username,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          phone: m.phone,
+        },
+        body: m.body,
+        sent_at: m.sent_at,
+        read_at: m.read_at,
+      }))
+    );
+  }
 
   /** Return messages to this user.
    * [{id, from_user, body, sent_at, read_at}]
    * where from_user is {username, first_name, last_name, phone} */
-  static async messagesTo(username) {}
+  static async messagesTo(username) {
+    const messages = await db.query(
+      `SELECT m.id, m.from_username, u.first_name, u.last_name, u.phone, body, sent_at, read_at 
+      FROM messages m
+      JOIN users u
+      ON u.username = m.from_username
+      WHERE to_username=$1`,
+      [username]
+    );
+    return (
+      messages.rows,
+      map((m) => ({
+        id: m.id,
+        from_user: {
+          username: m.from_username,
+          first_name: m.first_name,
+          last_name: m.last_name,
+          phone: m.phone,
+        },
+        body: m.body,
+        sent_at: m.sent_at,
+        read_at: m.read_at,
+      }))
+    );
+  }
 }
 
 module.exports = User;
