@@ -6,8 +6,12 @@ const router = new express.Router();
 /** GET / - get list of users.
  * => {users: [{username, first_name, last_name, phone}, ...]} */
 router.get("/", async (res, req, next) => {
-  const users = await User.all();
-  res.json({ users });
+  try {
+    const users = await User.all();
+    res.json({ users });
+  } catch (e) {
+    return next(e);
+  }
 });
 
 /** GET /:username - get detail of users.
